@@ -56,6 +56,9 @@ if __name__ == "__main__":
                 # Create a SunPy Map object
                 eis_map = asheis(data_save_path).get_intensity('fe_12_195.12')
                 m_eis_fixed, Txshift, Tyshift = alignment(eis_map, return_shift=True)
+                if Txshift is None or Tyshift is None or Txshift > 200 or Tyshift > 200:
+                    print(f"Skipping row as Txshift or Tyshift is None or greater than 200.")
+                    continue
                 # Create a SkyCoord object
                 coord = SkyCoord(hpc_x * u.arcsec, hpc_y * u.arcsec, frame=m_eis_fixed.coordinate_frame)
                 
