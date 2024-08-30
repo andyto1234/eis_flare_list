@@ -27,6 +27,10 @@ df['Tyshift'] = None
 if __name__ == "__main__":
     # Process each row
     for index, row in tqdm(df.iterrows(), total=len(df)):
+        # Check if hpc_x_pixel is already defined
+        if pd.notna(row['hpc_x_pixel']):
+            continue
+
         filename = row['filename']
         hpc_x = row['hpc x']
         hpc_y = row['hpc y']
