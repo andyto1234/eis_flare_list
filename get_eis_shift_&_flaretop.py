@@ -27,8 +27,8 @@ df['Tyshift'] = None
 # Process each row
 for index, row in tqdm(df.iterrows(), total=len(df)):
     filename = row['filename']
-    hpc_x = row['hpc_x']
-    hpc_y = row['hpc_y']
+    hpc_x = row['hpc x']
+    hpc_y = row['hpc y']
     
     # Construct the URLs
     year = filename[4:8]
