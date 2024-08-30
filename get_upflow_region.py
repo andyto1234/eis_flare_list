@@ -98,61 +98,61 @@ def find_largest_upflow_region(dopp_eis):
 # else:
 #     print("No significant upflow region found.")
 # Read the CSV file
+    # Function to download file with progress bar
+def download_file(url, save_path):
+    max_retries = 10
+    retry_delay = 10  # seconds
+    
+    for attempt in range(max_retries):
+        try:
+            response = requests.get(url, stream=True)
+            response.raise_for_status()
+            
+            total_size = int(response.headers.get('content-length', 0))
+            block_size = 1024  # 1 KB
+            
+            with open(save_path, 'wb') as f, tqdm(
+                desc=save_path.name,
+                total=total_size,
+                unit='iB',
+                unit_scale=True,
+                unit_divisor=1024,
+            ) as progress_bar:
+                for data in response.iter_content(block_size):
+                    size = f.write(data)
+                    progress_bar.update(size)
+            
+            print(f"Downloaded: {save_path}")
+            return True  # Success, return True
+        
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 404:
+                print(f"File not found (404 error): {url}")
+                return False  # Skip this file
+            elif attempt < max_retries - 1:
+                print(f"Error occurred: {str(e)}. Retrying in {retry_delay} seconds...")
+                import time
+                time.sleep(retry_delay)
+            else:
+                print(f"Failed to download after {max_retries} attempts: {url}")
+                print(f"Error: {str(e)}")
+                return False  # Skip this file after max retries
+        
+        except (requests.exceptions.RequestException, OSError) as e:
+            if attempt < max_retries - 1:
+                print(f"Error occurred: {str(e)}. Retrying in {retry_delay} seconds...")
+                import time
+                time.sleep(retry_delay)
+            else:
+                print(f"Failed to download after {max_retries} attempts: {url}")
+                print(f"Error: {str(e)}")
+                return False  # Skip this file after max retries
 
 if __name__ == "__main__":
     
     csv_path = 'abbys_flare_data/downloaded_flare_data.csv'
     df = pd.read_csv(csv_path)
 
-    # Function to download file with progress bar
-    def download_file(url, save_path):
-        max_retries = 10
-        retry_delay = 10  # seconds
-        
-        for attempt in range(max_retries):
-            try:
-                response = requests.get(url, stream=True)
-                response.raise_for_status()
-                
-                total_size = int(response.headers.get('content-length', 0))
-                block_size = 1024  # 1 KB
-                
-                with open(save_path, 'wb') as f, tqdm(
-                    desc=save_path.name,
-                    total=total_size,
-                    unit='iB',
-                    unit_scale=True,
-                    unit_divisor=1024,
-                ) as progress_bar:
-                    for data in response.iter_content(block_size):
-                        size = f.write(data)
-                        progress_bar.update(size)
-                
-                print(f"Downloaded: {save_path}")
-                return True  # Success, return True
-            
-            except requests.exceptions.HTTPError as e:
-                if e.response.status_code == 404:
-                    print(f"File not found (404 error): {url}")
-                    return False  # Skip this file
-                elif attempt < max_retries - 1:
-                    print(f"Error occurred: {str(e)}. Retrying in {retry_delay} seconds...")
-                    import time
-                    time.sleep(retry_delay)
-                else:
-                    print(f"Failed to download after {max_retries} attempts: {url}")
-                    print(f"Error: {str(e)}")
-                    return False  # Skip this file after max retries
-            
-            except (requests.exceptions.RequestException, OSError) as e:
-                if attempt < max_retries - 1:
-                    print(f"Error occurred: {str(e)}. Retrying in {retry_delay} seconds...")
-                    import time
-                    time.sleep(retry_delay)
-                else:
-                    print(f"Failed to download after {max_retries} attempts: {url}")
-                    print(f"Error: {str(e)}")
-                    return False  # Skip this file after max retries
 
     # Create a new CSV file to store results
     results_csv_path = 'upflow_results/upflow_results.csv'
